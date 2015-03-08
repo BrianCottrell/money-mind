@@ -1,0 +1,15 @@
+{
+  "name": "money_mind",
+  "version": "1.0.0",
+  "description": "Making a page to add files",
+  "main": "server.js",
+  "scripts": {
+    "test": "Hello"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.11.1",
+    "mongoose": "^3.8.22"
+  }
+}
