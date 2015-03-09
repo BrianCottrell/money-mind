@@ -9,21 +9,74 @@
     </head>
     <body>
         <style>
+        	body{
+        		margin: 0px;
+        		font-family: arial;
+        		color: rgb(10,30,150);
+        	}
         	.start{
         		position: absolute;
-        		padding: 25%;
-        		background-color: purple;
-        		z-index: 2;          		
+        		padding: 9% 20%;
+        		margin-left: 10%;
+        		margin-top: 3%;
+        		text-align: center;
+        		background: url('http://www.naturewallpaperworld.com/wp-content/uploads/2014/08/flower-camomile-summer-field-grass-blue-sky-nature.jpg');
+        		background-size: cover;
+        		border: 25px solid rgb(10,30,150);
+        		border-radius: 20px;
+        		z-index: 2;
         	}
         	.question{
         		position: absolute;
-        		padding: 25%;
-        		background-color: purple;
+        		padding: 15% 15%;
+        		margin-left: 12%;
+        		margin-top: 3%;
+        		text-align: center;
+        		background: url('http://assets.worldwildlife.org/photos/2842/images/hero_small/shutterstock_12730534.jpg?1352150501');
+        		background-size: cover;
+        		border: 25px solid rgb(10,30,150);
+        		border-radius: 10px;
         		z-index: 1;        		
+        	}
+        	.flower{
+        		position: absolute;
+        		margin-top: 250px;
+        		margin-left: 600px;
+        		padding: 200px;
+        		background: url(http://imgur.com/Q4znLAw.png);
+        		background-size: contain;
+        		background-repeat: no-repeat;
+        	}
+        	.compare{
+        		position: absolute;
+        		margin-top: 250px;
+        		margin-left: 1100px;
+        		padding: 300px;
+        		background: url(http://imgur.com/zIZEF05.png);
+        		background-repeat: no-repeat;
+        	}
+        	.accuracy{
+        		margin-top: -200px;
+        	}
+        	.next-question{
+        		display: none;
+        	}
+        	.final-question{
+        		display: none;
         	}
         </style>
 
+		<div class="flower">
+			<h2 class="accuracy"></h2>
+		</div>
+
+		<div class="compare">
+		</div>
+
+
         <div class="start">
+        	<h1>Welcome to Money Mind</h1>
+        	<h2>A place to improve your sense of financial awareness</h2>
   			<p>name</p>
   			<input class="name">
   			<p>password</p>
@@ -37,37 +90,42 @@
         </div>
 
   		<div class="question">
-  			<p>
-  				How much do you think that you spent this week?
-  			</p>
+  			<div class='final-question'>
+	  			<h2>
+	  				How much did you spend at Jamba Juice in the last month?
+	  			</h2>
+	  			<input class = "last-guess">	
+  			</div>
+
+  			<div class='next-question'>
+	  			<h2>
+	  				How much can you expect to gain or lose next month?
+	  			</h2>
+	  			<input class = "next-guess">
+	  			<button class="last-question">AnotherQuestion</button>		
+  			</div>
+
+  			<h2>
+  				How much do you think that you spent this past week?
+  			</h2>
   			<input class = "guess">
   			<button class="answer">Answer</button>
+  			<button class="another-question">Another Questions</button>
   		</div>
-
-        <!-- Header Chart -->
-        <div id="iframe_container" class='main' style="float:left">
-    		<iframe id="title-plot" width="1800" height="250" frameborder="0" seamless="seamless" scrolling="no" src="https://plot.ly/~playground/7.embed"></iframe>
-  		</div>
-
-        <!-- Body Chart -->
-        <div id="iframe_container" class='main' style="float:left">
-    		<iframe id="main-plot" width="900" height="400" frameborder="0" seamless="seamless" scrolling="no" src="https://plot.ly/~playground/7.embed"></iframe>
 
   		<!-- Footer Chart -->
         <div id="iframe_container" class='main' style="float:left">
     		<iframe id="footer-plot" width="1800" height="250" frameborder="0" seamless="seamless" scrolling="no" src="https://plot.ly/~playground/7.embed"></iframe>
   		</div>
-  		<div style="color:rgb(20,220,0)">Color Check</div>
-  		<div style="color:rgb(40,200,0)">Color Check</div>
-  		<div style="color:rgb(80,180,0)">Color Check</div>
-  		<div style="color:rgb(120,140,0)">Color Check</div>
 
-  		<div style="color:rgb(255,255,0)">Color Check</div>
+        <!-- Body Chart -->
+        <div id="iframe_container" class='main' style="float:left">
+    		<iframe id="main-plot" width="600" height="400" frameborder="0" seamless="seamless" scrolling="no" src="https://plot.ly/~playground/7.embed"></iframe>
 
-  		<div style="color:rgb(20,220,0)">Color Check</div>
-
-  		<div style="color:rgb(20,220,0)">Color Check</div>
-  		<div style="color:rgb(20,220,0)">Color Check</div>
+        <!-- Header Chart -->
+        <div id="iframe_container" class='main' style="float:left">
+    		<iframe id="title-plot" width="1800" height="250" frameborder="0" seamless="seamless" scrolling="no" src="https://plot.ly/~playground/7.embed"></iframe>
+  		</div>
 
   		<p>by Brian Cottrell</p>
         <script>
@@ -81,6 +139,8 @@
         	var weekTotal = 0;
         	var weekGuess = 0;
         	var user = "Bob Sled";
+        	var guessData = [];
+        	var transactionText = [];
 
         	function loadUser(UID, TOKEN){
 	        	//LEVEL MONEY API
@@ -95,8 +155,9 @@
 				    var pretty = JSON.stringify(parsed, null, 2);
 				    transactions = JSON.parse(this.response).transactions;
 				    for(var i = 0; i < transactions.length; i++){
-				    	amounts.push(transactions[i].amount)
-				    	amountsShadow.push(transactions[i].amount-50000000)
+				    	amounts.push(transactions[i].amount);
+				    	amountsShadow.push(transactions[i].amount-50000000);
+				    	transactionText.push(' Amount: '+transactions[i].amount+' To: '+transactions[i].merchant+' On: '+transactions[i]['transaction-time']);
 				    }
 //				    console.log(amounts);
 				};
@@ -139,6 +200,11 @@
 				    mainPlot.postMessage({task: 'ping'}, 'https://plot.ly');
 				}, 100);
 
+				guessData = [];
+				for (var i = 0; i < JSON.parse(localStorage.data1).length; i++){
+					guessData.push(Math.abs(100-Math.abs(parseInt(JSON.parse(localStorage.data1)[i]))));
+				}
+
 				window.addEventListener('message', function(e) {
 				    var message = e.data;
 				    if (message.pong) {
@@ -153,7 +219,7 @@
 					            type: 'scatter',
 					            data: [{
 					            	y: amounts,
-					            	text: amounts.map(function(){return 'a'}),
+					            	text: transactionText,
 					            	uid: 1,						
 					            	line: {
 										color: lineColor,
@@ -173,12 +239,14 @@
 								],
 		//			            data: [{y: amounts, mode: 'markers+lines', marker: {size: [10, 20, 30]}}],
 					            layout: {
-					            	title: 'AccountMe',
+					            	title: 'More about your financial transactions',
 					            	titlefont: {
-					            		size: '45',
+					            		size: '30',
 					            		color: 'green'
 					            	},
 					            	height: 20,
+					            	paper_bgcolor: 'rgb(255,255,255)',
+					            	plot_bgcolor:'rgb(255,255,255)',
 					            	xaxis: {
 					            		showticklabels: false,
 					            		showline: false,
@@ -194,7 +262,7 @@
 					            },
 					        }, 'https://plot.ly');
 					    }
-					    makeHeader('red');
+					    makeHeader('green');
 
 				        //MAIN PLOT
 				        function makeBody(lineColor){
@@ -202,7 +270,7 @@
 					            task: 'newPlot',
 					            type: 'scatter',
 					            data: [{
-					            	y: [15,156,13,55,23,32,111,114,134],
+					            	y: guessData,
 					            	uid: 3,						
 					            	line: {
 										color: lineColor,
@@ -210,23 +278,17 @@
 										opacity: 0.6
 									}}],
 					            layout: {
-					            	title: 'AccountMe',
+					            	title: 'Your account knowledge',
 					            	titlefont: {
-					            		size: '45',
+					            		size: '20',
 					            		color: 'green'
 					            	},
 					            	height: 20,
 					            	xaxis: {
-					            		showticklabels: false,
-					            		showline: false,
 					            		zeroline: false,
-					            		showgrid: false
 					            	},
 					            	yaxis: {
 					            		showticklabels: false,
-					            		showline: false,
-					            		zeroline: false,
-					            		showgrid: false
 					            	}
 					            },
 					        }, 'https://plot.ly');
@@ -235,7 +297,7 @@
 					            events: ['hover'],
 					        }, 'https://plot.ly');
 					    }
-					    makeBody('red');				    
+					    makeBody('green');				    
 
 				        //FOOTER PLOT
 				        function makeFooter() {
@@ -254,12 +316,14 @@
 									}
 								},
 					            layout: {
-					            	title: 'Footer',
+					            	title: 'Money Mind',
 					            	titlefont: {
-					            		size: '30',
-					            		color: 'green'
+					            		size: '45',
+					            		color: 'blue'
 					            	},
 					            	height: 20,
+					            	paper_bgcolor: 'rgb(255,255,255)',
+					            	plot_bgcolor: 'rgb(255,255,255)',
 					            	xaxis: {
 					            		showticklabels: false,
 					            		showline: false,
@@ -309,6 +373,7 @@
 				    		}else{
 				    			makeHeader('rgb(255,0,0)');
 				    		}
+
 				    	}
 				    	//console.log(transactions[t]);
 				    } else {
@@ -320,16 +385,18 @@
 				// 	mainPage[i].style.display = 'none';
 				// }
 			}
+//			loadUser(1110568334, '4CC6E59631F76B2F4CCAB80EEEAC159F');
 			loadUser(1110570164, '119947F2D985C3788998543A3D3AD90C');
 			document.getElementsByClassName('login')[0].addEventListener('click', function(){
-				user = document.getElementsByClassName('name')[0].value
+				user = document.getElementsByClassName('name')[0].value;
 				document.getElementsByClassName('start')[0].style.display = 'none';
-				// if(user = "Bob Sled"){
-				// 	loadUser(1110568334, '4CC6E59631F76B2F4CCAB80EEEAC159F');					
-				// }else if(user = "Allen Wrench"){
-				// 	loadUser(1110570164, '119947F2D985C3788998543A3D3AD90C');
-				// }
 			});
+			document.getElementsByClassName('another-question')[0].addEventListener('click', function(){
+				document.getElementsByClassName('next-question')[0].style.display = 'inline';
+				document.getElementsByClassName('last-question')[0].addEventListener('click', function(){
+					document.getElementsByClassName('final-question')[0].style.display = 'inline';
+				})
+			})
 			document.getElementsByClassName('answer')[0].addEventListener('click', function(){
 				document.getElementsByClassName('question')[0].style.display = 'none';
 				weekGuess = document.getElementsByClassName('guess')[0].value
@@ -344,12 +411,13 @@
 					}
 				}
 				var percentOff = (100*(weekTotal-weekGuess)/weekTotal).toFixed();
-				alert('Your were off by %'+percentOff);
+				document.getElementsByClassName('accuracy')[0].innerHTML = 'You were %'+Math.abs((100-Math.abs(percentOff)))+' accurate!';
 				if(!localStorage.data1){
 					localStorage.data1 = JSON.stringify([])
 				}
-				alert(JSON.parse(localStorage.data1).push(percentOff))
-				//localStorage.data1 = JSON.stringify(JSON.parse(localStorage.data1).push(percentOff));
+				var p = JSON.parse(localStorage.data1);
+				p.push(percentOff);
+				localStorage.data1 = JSON.stringify(p);
 			});
         </script>
     </body>
